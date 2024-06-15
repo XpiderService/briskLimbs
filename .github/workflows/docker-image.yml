@@ -31,7 +31,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          tags: "IMAGE"
+          tags: "image" # Corrected to lowercase
           outputs: ${{ github.event_name == 'pull_request' && 'type=cacheonly' || 'type=registry,push=true' }}
       
       - name: Deploy Docker image to self-hosted runner
@@ -42,5 +42,8 @@ jobs:
           password: ${{ secrets.SELF_HOSTED_RUNNER_PASSWORD }}
           port: ${{ secrets.SELF_HOSTED_RUNNER_SSH_PORT }}
           script: |
-            docker pull IMAGE
-            docker run -d --name my-container IMAGE
+            docker pull image
+            docker run -d --name my-container image
+
+            # Print URL and port
+            echo "URL: ${GITHUB_SERVER_URL}:${GITHUB_SERVER_PORT}"
