@@ -7,16 +7,15 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Pull Docker image
+      run: docker pull your-docker-image:tag
 
     - name: Log in to your VPS server via SSH
       uses: appleboy/ssh-action@master
@@ -26,13 +25,6 @@ jobs:
         password: ${{ secrets.VPS_PASSWORD }} # or use ssh-key
         port: ${{ secrets.VPS_SSH_PORT }} # default is 22
 
-    - name: Transfer Docker image to VPS
-      run: scp -P ${{ secrets.VPS_SSH_PORT }} my-image-name.tar.gz ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:/path/to/destination
-
-    - name: SSH into VPS and load Docker image
-      run: |
-        ssh -p ${{ secrets.VPS_SSH_PORT }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "docker load -i /path/to/your-image-name.tar.gz"
-
     - name: Run Docker container on VPS
       run: |
-        ssh -p ${{ secrets.VPS_SSH_PORT }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "docker run -d --name brisklimbs-container -p 8080:80 my-image-name:$(date +%s)"
+        ssh -p ${{ secrets.VPS_SSH_PORT }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "docker run -d --name brisklimbs-container -p 8080:80 your-docker-image:tag"
