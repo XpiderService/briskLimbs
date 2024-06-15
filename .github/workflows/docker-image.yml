@@ -5,6 +5,8 @@ on:
     branches:
       - main
   workflow_dispatch: # Allow manual triggering
+
+  
 jobs:
   docker:
     runs-on: self-hosted
@@ -12,11 +14,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      # Install Docker
       - name: Install Docker
         run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sh get-docker.sh
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
